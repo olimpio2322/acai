@@ -1,0 +1,5 @@
+{
+  "name": "Açaí Shop & Delivery System",
+  "description": "Complete Açaí shop ecosystem featuring a client ordering app with specific business logic (max 3 toppings, delivery fees) and a comprehensive admin dashboard for stock, orders, and menu management.",
+  "requestFramePermissions": []
+}
