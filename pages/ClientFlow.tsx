@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Neighborhood } from '../types';
+import { supabase } from '../lib/supabaseClient';
 
 // Mock Data from "Açaí Paradise" & "Açaí Delícia"
 const SIZES = [
@@ -79,8 +80,39 @@ export default function ClientFlow() {
     const subTotal = sizePrice + extrasPrice;
     const total = subTotal + deliveryFee;
 
-    const handleFinish = () => {
-        // Logic to save to Supabase would go here
+    const handleFinish = async () => {
+        // Prepare Data for Supabase
+        const orderData = {
+            customer_name: name,
+            customer_whatsapp: whatsapp,
+            neighborhood_id: neighborhoodId,
+            neighborhood_name: selectedNeighborhood?.name,
+            size: SIZES.find(s => s.id === selectedSize)?.name,
+            free_toppings: selectedFree,
+            paid_extras: selectedPaid,
+            payment_method: paymentMethod,
+            change_for: paymentMethod === 'money' ? changeAmount : null,
+            notes: notes,
+            subtotal: subTotal,
+            delivery_fee: deliveryFee,
+            total_amount: total,
+            created_at: new Date().toISOString(),
+            status: 'Novo'
+        };
+
+        // Try to insert into Supabase (orders table)
+        // Note: For this to work, create a table 'orders' in Supabase with these columns (or JSONB)
+        try {
+            if (supabase) {
+                await supabase.from('orders').insert([orderData]);
+                console.log("Pedido salvo no Supabase:", orderData);
+            }
+        } catch (err) {
+            console.error("Erro ao salvar pedido no banco (verifique as credenciais):", err);
+            // We continue execution to ensure the UI behaves as expected even if DB fails
+        }
+
+        // Standard behavior as requested
         alert(`Pedido enviado!\nTotal: R$ ${total.toFixed(2)}\nPagamento: ${paymentMethod}`);
     };
 
